@@ -2,9 +2,10 @@
 // Created by vance on 2016/8/5.
 //
 
-#include "ImageCompare.h"
+#include "ImageMerge.h"
 #include <algorithm>
 #include <hash_map>
+#include "MultiThreadTask.h"
 
 #define COLOR_MASKED 0x00000000
 #define COLOR_NOT_MASKED 0xFFFFFFFFFF
@@ -29,6 +30,65 @@
     else if ((y) > (f).bottom) (f).bottom = (y); \
 }
 
+#define PUSH_POINT_LEFT(x, y, index, width, height, pPixels, queue, tmpIndex) { \
+    if ((x - 1) >= 0) { \
+        tmpIndex = index - 1; \
+        if (pPixels[tmpIndex] != COLOR_MASKED) { \
+            queue.push(tmpIndex); \
+        } \
+    } \
+}
+#define PUSH_POINT_RIGHT(x, y, index, width, height, pPixels, queue, tmpIndex) { \
+    if ((x + 1) < width) { \
+        tmpIndex = index + 1; \
+        if (pPixels[tmpIndex] != COLOR_MASKED) { \
+            queue.push(tmpIndex); \
+        } \
+    } \
+}
+#define PUSH_POINT_TOP(x, y, index, width, height, pPixels, queue, tmpIndex) { \
+    if ((y - 1) >= 0) { \
+        tmpIndex = index - width; \
+        if (pPixels[tmpIndex] != COLOR_MASKED) { \
+            queue.push(tmpIndex); \
+        } \
+    } \
+}
+#define PUSH_POINT_BOTTOM(x, y, index, width, height, pPixels, queue, tmpIndex) { \
+    if ((y + 1) < height) { \
+        tmpIndex = index + width; \
+        if (pPixels[tmpIndex] != COLOR_MASKED) { \
+            queue.push(tmpIndex); \
+        } \
+    } \
+}
+
+#define GENERATE_MASK_ARG_INIT(arg, pObj, pXor, pTrimmed, pMask) { \
+    arg.pCompare = pObj; \
+    arg.pXorBmp = pXor; \
+    arg.pTrimmedBmp = pTrimmed; \
+    arg.pMaskBmp = pMask; \
+}
+
+#define GENERATE_FEATURES_ARG_INIT(arg, pObj, pMask, pFeatures_) { \
+    arg.pCompare = pObj; \
+    arg.pMaskBmp = pMask; \
+    arg.pFeatures = pFeatures_; \
+}
+
+struct GenerateMaskArg {
+    IN ImageCompare* pCompare;
+    IN NativeBitmap* pXorBmp;
+    IN NativeBitmap* pTrimmedBmp;
+    OUT NativeBitmap* pMaskBmp;
+};
+
+struct GenerateFeaturesArg {
+    IN ImageCompare* pCompare;
+    IN NativeBitmap* pMaskBmp;
+    OUT FeatureList* pFeatures;
+};
+
 void ImageCompare::merge(IN const NativeBitmap& bmp1, IN const NativeBitmap& bmp2, OUT NativeBitmap& merged) {
     TIME_BEGIN;
 
@@ -44,14 +104,28 @@ void ImageCompare::merge(IN const NativeBitmap& bmp1, IN const NativeBitmap& bmp
 
     // mask
     NativeBitmap mask1, mask2;
-    generateMask(xorBmp, trimmed1, mask1);
-    generateMask(xorBmp, trimmed2, mask2);
+    {
+        GenerateMaskArg arg1, arg2;
+        GENERATE_MASK_ARG_INIT(arg1, this, &xorBmp, &trimmed1, &mask1);
+        GENERATE_MASK_ARG_INIT(arg2, this, &xorBmp, &trimmed2, &mask2);
+        void *args[] = {&arg1, &arg2};
+        MultiThreadTask::start(generateMaskThreadRun, 2, args);
+    }
+    //generateMask(xorBmp, trimmed1, mask1);
+    //generateMask(xorBmp, trimmed2, mask2);
     xorBmp.recycle();
 
     // feature
     FeatureList featureList1, featureList2;
-    generateFeatures(mask1, featureList1);
-    generateFeatures(mask2, featureList2);
+    {
+        GenerateFeaturesArg arg1, arg2;
+        GENERATE_FEATURES_ARG_INIT(arg1, this, &mask1, &featureList1);
+        GENERATE_FEATURES_ARG_INIT(arg2, this, &mask2, &featureList2);
+        void *args[] = {&arg1, &arg2};
+        MultiThreadTask::start(generateFeaturesThreadRun, 2, args);
+    }
+    //generateFeatures(mask1, featureList1);
+    //generateFeatures(mask2, featureList2);
 
     // compare
     jint distance = compareFeatures(trimmed1, mask1, featureList1, trimmed2, mask2, featureList2);
@@ -71,6 +145,7 @@ void ImageCompare::trim(IN const NativeBitmap& bmp1, IN const NativeBitmap& bmp2
 
     jint width = bmp1.getWidth();
     jint height = bmp1.getHeight();
+    jint pixelsCount = bmp1.getPixelsCount();
 
     // get pixels
     jint* pPixels1 = bmp1.getPixels();
@@ -78,7 +153,7 @@ void ImageCompare::trim(IN const NativeBitmap& bmp1, IN const NativeBitmap& bmp2
 
     // find the first different index from top & bottom
     jint topIndex = topOffset * width;
-    jint bottomIndex = width * height - 1;
+    jint bottomIndex = pixelsCount - 1;
     while (pPixels1[topIndex] == pPixels2[topIndex]) {
         topIndex ++;
     }
@@ -86,13 +161,17 @@ void ImageCompare::trim(IN const NativeBitmap& bmp1, IN const NativeBitmap& bmp2
         bottomIndex --;
     }
 
-    // get row index
-    trimTop = topIndex / width;
-    trimBottom = bottomIndex / width;
+    // get row index that should be
+    jint trimmedTopRowIndex = topIndex / width;
+    jint trimmedBottomRowIndex = bottomIndex / width;
 
     // create trimmed bitmap
-    NativeBitmap::create(bmp1, trimTop, trimBottom, trimmed1);
-    NativeBitmap::create(bmp2, trimTop, trimBottom, trimmed2);
+    NativeBitmap::create(bmp1, trimmedTopRowIndex, trimmedBottomRowIndex, trimmed1);
+    NativeBitmap::create(bmp2, trimmedTopRowIndex, trimmedBottomRowIndex, trimmed2);
+
+    // generate the number of rows that should be trimmed from top & bottom
+    trimTop = trimmedTopRowIndex;
+    trimBottom = height - trimmedBottomRowIndex - 1;
 
     TIME_END("trim()");
 }
@@ -115,22 +194,53 @@ void ImageCompare::xorBitmap(IN const NativeBitmap& bmp1, IN const NativeBitmap&
 
 void ImageCompare::generateMask(IN const NativeBitmap& xorBmp, IN const NativeBitmap& bmp, OUT NativeBitmap& mask) {
     TIME_BEGIN;
+    LOGI("==MyTest==", "generateMask()# begin");
 
     NativeBitmap::create(xorBmp, mask);
-    jint* pMask = mask.getPixels();
+    jint* pBmpPixels = bmp.getPixels();
+    jint* pMaskPixels = mask.getPixels();
     jint width = mask.getWidth();
     jint height = mask.getHeight();
     jint index = 0;
+    float count, diff;
+    jint i;
+    jint pixel, tmpPixel;
+    jint xStart, xEnd, yStart, yEnd;
+    jint da, dr, dg, db;
+    jint tx, ty;
 
     for (jint y=0; y<height; y++) {
         for (jint x=0; x<width; x++) {
-            if (pMask[index] != COLOR_MASKED) {
-                pMask[index] = isSimilarWithMaskedColor(x, y, bmp, mask, 1) ? COLOR_MASKED : COLOR_NOT_MASKED;
+            if (pMaskPixels[index] != COLOR_MASKED) {
+                count = diff = 0.0f;
+                pixel = bmp.getPixel(x, y);
+                xStart = TRIM(x - 1, 0, width - 1); //mask.trimX(x - o); // TODO
+                xEnd = TRIM(x + 1, 0, width - 1); //mask.trimX(x + o);
+                yStart = TRIM(y - 1, 0, height - 1); //mask.trimY(y - o);
+                yEnd = TRIM(y + 1, 0, height - 1); //mask.trimY(y + o);
+                for (ty=yStart; ty<=yEnd; ty++) {
+                    for (tx=xStart; tx<=xEnd; tx++) {
+                        i = XY_TO_INDEX(tx, ty, width); // bmp.xyToIndex(x, y); spend too much CPU time. directly compute without call a method
+                        tmpPixel = pBmpPixels[i];
+                        if (pMaskPixels[i] == COLOR_MASKED) {
+                            // generate color diff
+                            da = COLOR_DIFF_A(pixel, tmpPixel);
+                            dr = COLOR_DIFF_R(pixel, tmpPixel);
+                            dg = COLOR_DIFF_G(pixel, tmpPixel);
+                            db = COLOR_DIFF_B(pixel, tmpPixel);
+
+                            diff += da*da + dr*dr + dg*dg + db*db;
+                            count ++;
+                        }
+                    }
+                }
+
+                pMaskPixels[index] = ((count > 0) && ((diff / count) < MAX_COLOR_DIFF_POWER2)) ? COLOR_MASKED : COLOR_NOT_MASKED;
             }
             index ++;
         }
     }
-
+    LOGI("==MyTest==", "generateMask()# end");
     TIME_END("generateMask()");
 }
 
@@ -140,36 +250,54 @@ void ImageCompare::generateFeatures(IN const NativeBitmap& mask, OUT FeatureList
     std::queue<jint> queue;
     Feature tmpFeature;
     jint width = mask.getWidth();
+    jint height = mask.getHeight();
     jint pixelsCount = mask.getPixelsCount();
-    jint index = 0;
     jint* pMaskPixels = mask.getPixels();
+    jint x, y, index, tmpIndex;
     for (jint i=0; i<pixelsCount; i++) {
-        if (pMaskPixels[i] != COLOR_MASKED) {
-            queue.push(i);
+        if (pMaskPixels[i] == COLOR_MASKED) {
+            // the point is already masked. ignore it.
+            continue;
+        }
 
-            // init tmpFeature
-            tmpFeature.left = tmpFeature.right = X_FROM_INDEX(i, width);
-            tmpFeature.top = tmpFeature.bottom = Y_FROM_INDEX(i, width);
-            tmpFeature.pixelCount = 0;
+        queue.push(i);
 
-            while (!queue.empty()) {
-                // pop an index from queue
-                index = queue.front();
-                queue.pop();
+        // init tmpFeature
+        tmpFeature.left = tmpFeature.right = X_FROM_INDEX(i, width);
+        tmpFeature.top = tmpFeature.bottom = Y_FROM_INDEX(i, width);
+        tmpFeature.pixelCount = 0;
 
-                // ignore masked point
-                if (pMaskPixels[index] == COLOR_MASKED) {
-                    continue;
-                }
+        while (!queue.empty()) {
+            // pop an index from queue
+            index = queue.front();
+            queue.pop();
 
-                // find a feature
-                findRect(index, queue, mask, tmpFeature);
+            // ignore masked point
+            if (pMaskPixels[index] == COLOR_MASKED) {
+                continue;
             }
 
-            // save feature
-            if (tmpFeature.pixelCount > MIN_FEATURE_PIXEL_COUNT) { // if the rect is too small. It is not valuable
-                outFeatures.push_back(tmpFeature);
-            }
+            // get x y
+            x = X_FROM_INDEX(index, width);
+            y = Y_FROM_INDEX(index, width);
+
+            // update feature
+            FEATURE_INCLUDE_POINT(tmpFeature, x, y);
+            tmpFeature.pixelCount ++;
+
+            // mask the current point
+            pMaskPixels[index] = COLOR_MASKED;
+
+            // push points around
+            PUSH_POINT_LEFT(x, y, index, width, height, pMaskPixels, queue, tmpIndex);
+            PUSH_POINT_TOP(x, y, index, width, height, pMaskPixels, queue, tmpIndex);
+            PUSH_POINT_RIGHT(x, y, index, width, height, pMaskPixels, queue, tmpIndex);
+            PUSH_POINT_BOTTOM(x, y, index, width, height, pMaskPixels, queue, tmpIndex);
+        }
+
+        // save feature
+        if (tmpFeature.pixelCount > MIN_FEATURE_PIXEL_COUNT) { // if the rect is too small. It is not valuable
+            outFeatures.push_back(tmpFeature);
         }
     }
 
@@ -265,15 +393,18 @@ void ImageCompare::mergeBitmap(IN const NativeBitmap& bmp1, IN const NativeBitma
 
     // generate start row & end row
     jint width = bmp1.getWidth();
-    jint height = bmp1.getHeight();
-    jint newHeight = height + distance;
-    jint sameHeight = trimBottom - trimTop + 1;
+    jint height1 = bmp1.getHeight();
+    jint height2 = bmp2.getHeight();
+    jint newHeight = height1 + distance;
+    jint sameHeight = height2 - trimBottom - trimTop - distance;
 
     //
-    //jint y1 = 0;
-    jint height1 = trimTop + distance + (sameHeight / 2);
-    jint y2 = trimTop + (sameHeight / 2);
-    jint height2 = bmp2.getHeight() - y2;
+    jint newY1 = 0;
+    jint newHeight1 = height1 - trimBottom - (sameHeight / 2);
+    jint newY2 = trimTop + sameHeight - (sameHeight / 2);
+    jint newHeight2 = height2 - newY2;
+
+    LOGI("==MyTest==", "trimTop: %d, trimBottom: %d, newY1: %d, newHeight1: %d, newY2: %d, newHeight2: %d", trimTop, trimBottom, newY1, newHeight1, newY2, newHeight2);
 
     // merge to out
     NativeBitmap::create(width, newHeight, merged);
@@ -281,11 +412,11 @@ void ImageCompare::mergeBitmap(IN const NativeBitmap& bmp1, IN const NativeBitma
     jint* pBmp1 = bmp1.getPixels();
     jint* pBmp2 = bmp2.getPixels();
     memcpy( pOut,
-            pBmp1,
-            height1 * width * sizeof(jint));
-    memcpy( pOut + (height1 * width),
-            pBmp2 + (y2 * width),
-            height2 * width * sizeof(jint));
+            pBmp1 + (newY1 * width),
+            newHeight1 * width * sizeof(jint));
+    memcpy( pOut + (newHeight1 * width),
+            pBmp2 + (newY2 * width),
+            newHeight2 * width * sizeof(jint));
 
     TIME_END("mergeBitmap()");
 }
@@ -485,4 +616,14 @@ float ImageCompare::diffRect(IN const NativeBitmap& bmp1, IN const NativeBitmap&
     }
 
     return ((float)diff) / f1.pixelCount;
+}
+
+void* ImageCompare::generateMaskThreadRun(void* arg) {
+    GenerateMaskArg* pArg = (GenerateMaskArg*) arg;
+    pArg->pCompare->generateMask(*(pArg->pXorBmp), *(pArg->pTrimmedBmp), *(pArg->pMaskBmp));
+}
+
+void* ImageCompare::generateFeaturesThreadRun(void* arg) {
+    GenerateFeaturesArg* pArg = (GenerateFeaturesArg*) arg;
+    pArg->pCompare->generateFeatures(*(pArg->pMaskBmp), *(pArg->pFeatures));
 }

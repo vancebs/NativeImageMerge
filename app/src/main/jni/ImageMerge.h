@@ -44,6 +44,9 @@ private:
 
     bool static sort_by_s(const Feature& obj1,const Feature& obj2);
     float diffRect(IN const NativeBitmap& bmp1, IN const NativeBitmap& mask1, IN const Feature& f1, IN const NativeBitmap& bmp2, IN const NativeBitmap& mask2, IN const Feature& f2);
+
+    static void* generateMaskThreadRun(void* arg);
+    static void* generateFeaturesThreadRun(void* arg);
 };
 
 

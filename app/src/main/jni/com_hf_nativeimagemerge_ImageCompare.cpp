@@ -1,5 +1,5 @@
 #include "com_hf_nativeimagemerge_ImageCompare.h"
-#include "ImageCompare.h"
+#include "ImageMerge.h"
 
 #define FEATURE_CLASS(pEnv) (pEnv)->FindClass("com/hf/nativeimagemerge/ImageCompare$Feature")
 #define FEATURE_CONSTRUCTOR(pEnv, clazz) (pEnv)->GetMethodID((clazz), "<init>", "()V")
@@ -10,11 +10,25 @@
 #define FEATURE_FIELD_BOTTOM(pEnv, clazz) (pEnv)->GetFieldID((clazz), "bottom", "I")
 #define FEATURE_FIELD_PIXEL_COUNT(pEnv, clazz) (pEnv)->GetFieldID((clazz), "pixelCount", "I")
 
+#define BITMAP_CLASS(pEnv) (pEnv)->FindClass("android/graphics/Bitmap")
+#define BITMAP_METHOD_CREATEBITMAP(pEnv) (pEnv)->GetStaticMethodID()
+/*
+public static Bitmap createBitmap(int colors[], int offset, int stride,
+            int width, int height, Config config) {
+            */
+
 ImageCompare sImageCompare;
 
 jobjectArray toFeatureArrayObject(JNIEnv * env, IN FeatureList& features);
 void fromFeatureArrayObject(JNIEnv * env, jobjectArray array, OUT FeatureList& features);
 jobjectArray newEmptyFeatureArrayObject(JNIEnv * env);
+
+void drawBitmap(int env, char* path, NativeBitmap& bmp) {
+    JNIEnv* pEnv = (JNIEnv*) env;
+
+    jclass bitmapClass = BITMAP_CLASS(pEnv);
+    //jmethodID createBitmapMethod = pEnv->GetStaticMethodID(bitmapClass, "createBitmap", "(I[IIII)");
+}
 
 /*
  * Class:     com_hf_nativeimagemerge_ImageCompare
