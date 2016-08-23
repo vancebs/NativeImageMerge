@@ -9,7 +9,7 @@
 #define DEBUG_IMG_TRIMMED1     "trimmed1.png"
 #define DEBUG_IMG_TRIMMED2     "trimmed2.png"
 
-void ImageCompare::mergeByFeature(IN const NativeBitmap& bmp1, IN const NativeBitmap& bmp2, OUT NativeBitmap& merged, IN Debugger* pDebugger) {
+void ImageCompare::mergeByFeature(IN const NativeBitmap& bmp1, IN const NativeBitmap& bmp2, OUT NativeBitmap& merged, IN OnCompareFinishedListener& listener, IN Debugger* pDebugger) {
     TRACE_INIT(pDebugger);
 
     // trim
@@ -28,15 +28,23 @@ void ImageCompare::mergeByFeature(IN const NativeBitmap& bmp1, IN const NativeBi
     trimmed2.recycle();
     LOGI("==MyTest==", "distance: %d", distance);
 
+    // call listener
+    TRACE_BEGIN(pDebugger);
+    jboolean shouldMerge = listener.onCompareFinished(distance);
+    LOGI("==MyTest==", "should merge: %s", shouldMerge ? "true" : "false");
+    TRACE_END(pDebugger, "call listener");
+
     // merge
     TRACE_BEGIN(pDebugger);
-    mergeBitmap(bmp1, bmp2, trimTop, trimBottom, distance, merged);
+    if (shouldMerge) {
+        mergeBitmap(bmp1, bmp2, trimTop, trimBottom, distance, merged);
+    }
     TRACE_END(pDebugger, "merge");
 
     TRACE_FINISH(pDebugger, "finished");
 }
 
-void ImageCompare::mergeByHash(IN const NativeBitmap& bmp1, IN const NativeBitmap& bmp2, OUT NativeBitmap& merged, IN Debugger* pDebugger) {
+void ImageCompare::mergeByHash(IN const NativeBitmap& bmp1, IN const NativeBitmap& bmp2, OUT NativeBitmap& merged, IN OnCompareFinishedListener& listener, IN Debugger* pDebugger) {
     TRACE_INIT(pDebugger);
 
     // trim
@@ -55,9 +63,17 @@ void ImageCompare::mergeByHash(IN const NativeBitmap& bmp1, IN const NativeBitma
     trimmed2.recycle();
     LOGI("==MyTest==", "distance: %d", distance);
 
+    // call listener
+    TRACE_BEGIN(pDebugger);
+    jboolean shouldMerge = listener.onCompareFinished(distance);
+    LOGI("==MyTest==", "should merge: %s", shouldMerge ? "true" : "false");
+    TRACE_END(pDebugger, "call listener");
+
     // merge
     TRACE_BEGIN(pDebugger);
-    mergeBitmap(bmp1, bmp2, trimTop, trimBottom, distance, merged);
+    if (shouldMerge) {
+        mergeBitmap(bmp1, bmp2, trimTop, trimBottom, distance, merged);
+    }
     TRACE_END(pDebugger, "merge");
 
     TRACE_FINISH(pDebugger, "finished");

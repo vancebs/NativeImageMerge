@@ -14,7 +14,7 @@ extern "C" {
  * Signature: (JJ)J
  */
 JNIEXPORT jlong JNICALL Java_com_hf_nativeimagemerge_ImageMerge_nativeMergeByFeature
-  (JNIEnv *, jclass, jlong, jlong);
+  (JNIEnv *, jclass, jlong, jlong, jobject);
 
 /*
  * Class:     com_hf_nativeimagemerge_ImageCompare
@@ -22,7 +22,7 @@ JNIEXPORT jlong JNICALL Java_com_hf_nativeimagemerge_ImageMerge_nativeMergeByFea
  * Signature: (JJ)J
  */
 JNIEXPORT jlong JNICALL Java_com_hf_nativeimagemerge_ImageMerge_nativeMergeByHash
-        (JNIEnv *, jclass, jlong, jlong);
+        (JNIEnv *, jclass, jlong, jlong, jobject);
 
 #ifdef __cplusplus
 }
