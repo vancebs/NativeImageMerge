@@ -6,7 +6,7 @@
 #define NATIVEIMAGEMERGE_LOG_H
 #include <android/log.h>
 
-#ifdef _DEBUG
+#ifdef _DEBUG_LOG
 
 
 
@@ -22,6 +22,6 @@
 #define  LOGD(tag, ...)
 #define  LOGW(tag, ...)
 
-#endif // _DEBUG
+#endif // _DEBUG_LOG
 
 #endif //NATIVEIMAGEMERGE_LOG_H

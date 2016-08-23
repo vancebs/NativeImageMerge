@@ -19,7 +19,7 @@ model {
         }
 
         ndk {
-            moduleName = "ImageCompare"
+            moduleName = "ImageMerge"
 
             stl = "stlport_shared"
             //ldLibs "log", "z", "m"

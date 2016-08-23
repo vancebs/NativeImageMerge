@@ -9,22 +9,15 @@
 #include <jni.h>
 #include <vector>
 
-#define _DEBUG
-#include "log.h"
-
-// debug performance
-#ifdef _DEBUG
-#include <time.h>
-#define TIME_BEGIN clock_t __begin = clock()
-#define TIME_END(tag) LOGD(tag, "# %dms", ((clock() - __begin) / 1000))
-#else
-#define TIME_BEGIN
-#define TIME_END(tag)
-#endif
-
 #define IN
 #define OUT
 #define INOUT
+
+#define _DEBUG_IMAGE
+#define _DEBUG_PERFORMANCE
+#define _DEBUG_LOG
+
+#include "log.h"
 
 #define NATIVE_BITMAP(pBmp) (*((NativeBitmap*)(pBmp)))
 

@@ -59,6 +59,6 @@ public class NativeBitmap {
     private static native int nativeGetHeight(long ptr);
 
     static {
-        System.loadLibrary("ImageCompare");
+        System.loadLibrary("ImageMerge");
     }
 }
