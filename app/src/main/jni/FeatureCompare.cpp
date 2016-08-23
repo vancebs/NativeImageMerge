@@ -374,44 +374,6 @@ jint FeatureCompare::compareFeatures(IN const NativeBitmap& bmp1, IN const Nativ
     return maxDistance;
 }
 
-inline bool FeatureCompare::isSimilarWithMaskedColor(IN const int x, IN const int y, IN const NativeBitmap& bmp, INOUT NativeBitmap& mask, int o) {
-    jint* pBmpPixels = bmp.getPixels();
-    jint* pMaskPixels = mask.getPixels();
-    jint width = bmp.getWidth();
-    jint height = bmp.getHeight();
-    float count = 0;
-    float diff = 0;
-    jint tmpPixel;
-    jint index = 0;
-    jint pixel = bmp.getPixel(x, y);
-    jint xStart = TRIM(x - o, 0, width - 1); //mask.trimX(x - o); // TODO
-    jint xEnd = TRIM(x + o, 0, width - 1); //mask.trimX(x + o);
-    jint yStart = TRIM(y - o, 0, height - 1); //mask.trimY(y - o);
-    jint yEnd = TRIM(y + o, 0, height - 1); //mask.trimY(y + o);
-    jint da, dr, dg, db;
-    jint tx, ty;
-    for (ty=yStart; ty<=yEnd; ty++) {
-        for (tx=xStart; tx<=xEnd; tx++) {
-            index = XY_TO_INDEX(tx, ty, width); // bmp.xyToIndex(x, y); spend too much CPU time. directly compute without call a method
-            tmpPixel = pBmpPixels[index];
-            if (pMaskPixels[index] == COLOR_MASKED) {
-                // generate color diff
-                da = COLOR_DIFF_A(pixel, tmpPixel);
-                dr = COLOR_DIFF_R(pixel, tmpPixel);
-                dg = COLOR_DIFF_G(pixel, tmpPixel);
-                db = COLOR_DIFF_B(pixel, tmpPixel);
-
-                diff += da*da + dr*dr + dg*dg + db*db;
-                count ++;
-            }
-
-            //index ++;
-        }
-    }
-
-    return (count > 0) && ((diff / count) < MAX_COLOR_DIFF_POWER2);
-}
-
 #if 1
 inline void FeatureCompare::findRect(IN const jint index, INOUT std::queue<jint>& queue, INOUT const NativeBitmap& mask, INOUT Feature& feature) {
     jint* pMaskPixels = mask.getPixels();

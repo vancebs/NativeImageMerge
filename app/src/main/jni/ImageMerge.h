@@ -8,17 +8,16 @@
 #include "inc.h"
 #include "NativeBitmap.h"
 #include "Debugger.h"
-#include "OnCompareFinishedListener.h"
 
 
 class ImageCompare {
 public:
-    void mergeByFeature(IN const NativeBitmap& bmp1, IN const NativeBitmap& bmp2, OUT NativeBitmap& merged, IN OnCompareFinishedListener& listener, IN Debugger* pDebugger = NULL);
-    void mergeByHash(IN const NativeBitmap& bmp1, IN const NativeBitmap& bmp2, OUT NativeBitmap& merged, IN OnCompareFinishedListener& listener, IN Debugger* pDebugger = NULL);
+    jint compareByFeature(IN const NativeBitmap& bmp1, IN const NativeBitmap& bmp2, OUT jint& trimTop, OUT jint& trimBottom, IN Debugger* pDebugger = NULL);
+    jint compareByHash(IN const NativeBitmap& bmp1, IN const NativeBitmap& bmp2, OUT jint& trimTop, OUT jint& trimBottom, IN Debugger* pDebugger = NULL);
+    void mergeBitmap(IN const NativeBitmap& bmp1, IN const NativeBitmap& bmp2, IN const jint trimTop, IN const jint trimBottom, IN const jint distance, OUT NativeBitmap& merged);
 
 private:
     void trim(IN const NativeBitmap& bmp1, IN const NativeBitmap& bmp2, IN const jint topOffset, OUT NativeBitmap& trimmed1, OUT NativeBitmap& trimmed2, OUT jint& trimTop, OUT jint& trimBottom);
-    void mergeBitmap(IN const NativeBitmap& bmp1, IN const NativeBitmap& bmp2, IN const jint trimTop, IN const jint trimBottom, IN const jint distance, OUT NativeBitmap& merged);
 };
 
 

@@ -49,6 +49,7 @@ public class BitmapDecoder {
         }
     }
 
+    @SuppressWarnings("unused")
     public static void writeImage(String path, Bitmap bmp) {
         FileOutputStream fos = null;
         try {

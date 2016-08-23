@@ -3,6 +3,7 @@ package com.hf.nativeimagemerge;
 import android.graphics.Bitmap;
 
 /**
+ * NativeBitmap
  * Created by vance on 2016/8/4.
  */
 public class NativeBitmap {
@@ -12,38 +13,82 @@ public class NativeBitmap {
         mNativePtr = ptr;
     }
 
+    /**
+     * Create NativeBitmap
+     * @param width width
+     * @param height height
+     * @return NativeBitmap
+     */
     public static NativeBitmap create(int width, int height) {
         return new NativeBitmap(nativeCreate(width, height));
     }
 
+    /**
+     * Create NativeBitmap
+     * @param src src NativeBitmap
+     * @return NativeBitmap
+     */
     public static NativeBitmap create(NativeBitmap src) {
         return new NativeBitmap(nativeCreate(src.mNativePtr));
     }
 
+    /**
+     * Create NativeBitmap
+     * @param src src NativeBitmap
+     * @param startRow start row index
+     * @param endRow end row index
+     * @return NativeBitmap
+     */
     public static NativeBitmap create(NativeBitmap src, int startRow, int endRow) {
         return new NativeBitmap(nativeCreate(src.mNativePtr, startRow, endRow));
     }
 
+    /**
+     * Create NativeBitmap from Bitmap
+     * @param bitmap bitmap
+     * @return NativeBitmap
+     */
     public static NativeBitmap createFromBitmap(Bitmap bitmap) {
         return new NativeBitmap(nativeFromBitmap(bitmap));
     }
 
+    /**
+     * Get the native pointer
+     * @return native pointer
+     */
     public long getNativePtr() {
         return mNativePtr;
     }
 
+    /**
+     * Recycle native bitmap
+     */
     public void recycle() {
         nativeRecycle(mNativePtr);
     }
 
+    /**
+     * Convert NativeBitmap to Bitmap
+     * @return Bitmap
+     */
     public Bitmap toBitmap() {
         return (Bitmap) nativeToBitmap(mNativePtr);
     }
 
+    /**
+     * Get NativeBitmap width
+     * @return width
+     */
+    @SuppressWarnings("unused")
     public int getWidth() {
         return nativeGetWidth(mNativePtr);
     }
 
+    /**
+     * Get NativeBitmap height
+     * @return height
+     */
+    @SuppressWarnings("unused")
     public int getHeight() {
         return nativeGetHeight(mNativePtr);
     }

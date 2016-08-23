@@ -1,56 +1,79 @@
 #include "com_hf_nativeimagemerge_ImageMerge.h"
 #include "ImageMerge.h"
 
+#define INDEX_TRIM_TOP 0
+#define INDEX_TRIM_BOTTOM 1
+
 ImageCompare sImageCompare;
 
 /*
  * Class:     com_hf_nativeimagemerge_ImageCompare
- * Method:    nativeMerge
- * Signature: (JJ)J
+ * Method:    nativeCompareByFeature
+ * Signature: (JJ[I)I
  */
-JNIEXPORT jlong JNICALL Java_com_hf_nativeimagemerge_ImageMerge_nativeMergeByFeature(JNIEnv * env, jclass cls, jlong bmp1, jlong bmp2, jobject listener) {
+JNIEXPORT jint JNICALL Java_com_hf_nativeimagemerge_ImageMerge_nativeCompareByFeature(JNIEnv * env, jclass cls, jlong bmp1, jlong bmp2, jintArray trimmed) {
     if (bmp1 == 0 || bmp2 == 0) {
         return 0;
     }
 
-    // create listener
-    OnCompareFinishedListener myListener(env, listener);
+    jint trimmedArray[2];
+    jint distance;
 
-    // Do merge
-    NativeBitmap* pBmp = new NativeBitmap();
-
+    // compare
 #if defined _DEBUG_IMAGE || defined _DEBUG_PERFORMANCE
     Debugger debugger(env);
-    sImageCompare.mergeByFeature(NATIVE_BITMAP(bmp1), NATIVE_BITMAP(bmp2), *pBmp, myListener, &debugger);
+    distance = sImageCompare.compareByFeature(NATIVE_BITMAP(bmp1), NATIVE_BITMAP(bmp2), trimmedArray[INDEX_TRIM_TOP], trimmedArray[INDEX_TRIM_BOTTOM], &debugger);
 #else
-    sImageCompare.mergeByFeature(NATIVE_BITMAP(bmp1), NATIVE_BITMAP(bmp2), *pBmp, myListener);
+    distance = sImageCompare.mergeByFeature(NATIVE_BITMAP(bmp1), NATIVE_BITMAP(bmp2), trimmedArray[INDEX_TRIM_TOP], trimmedArray[INDEX_TRIM_BOTTOM]);
 #endif
 
-    return (jlong) pBmp;
+    // return trimmed top & bottom
+    env->SetIntArrayRegion(trimmed, 0, 2, trimmedArray);
+
+    return distance;
+}
+
+/*
+ * Class:     com_hf_nativeimagemerge_ImageCompare
+ * Method:    nativeCompareByHash
+ * Signature: (JJ[I)I
+ */
+JNIEXPORT jint JNICALL Java_com_hf_nativeimagemerge_ImageMerge_nativeCompareByHash(JNIEnv * env, jclass cls, jlong bmp1, jlong bmp2, jintArray trimmed) {
+    if (bmp1 == 0 || bmp2 == 0) {
+        return 0;
+    }
+
+    jint trimmedArray[2];
+    jint distance;
+
+    // compare
+#if defined _DEBUG_IMAGE || defined _DEBUG_PERFORMANCE
+    Debugger debugger(env);
+    distance = sImageCompare.compareByHash(NATIVE_BITMAP(bmp1), NATIVE_BITMAP(bmp2), trimmedArray[INDEX_TRIM_TOP], trimmedArray[INDEX_TRIM_BOTTOM], &debugger);
+#else
+    distance = sImageCompare.mergeByHash(NATIVE_BITMAP(bmp1), NATIVE_BITMAP(bmp2), trimmedArray[INDEX_TRIM_TOP], trimmedArray[INDEX_TRIM_BOTTOM]);
+#endif
+
+    // return trimmed top & bottom
+    env->SetIntArrayRegion(trimmed, 0, 2, trimmedArray);
+
+    return distance;
 }
 
 /*
  * Class:     com_hf_nativeimagemerge_ImageCompare
  * Method:    nativeMerge
- * Signature: (JJ)J
+ * Signature: (JJIII)J
  */
-JNIEXPORT jlong JNICALL Java_com_hf_nativeimagemerge_ImageMerge_nativeMergeByHash(JNIEnv * env, jclass cls, jlong bmp1, jlong bmp2, jobject listener) {
+JNIEXPORT jlong JNICALL Java_com_hf_nativeimagemerge_ImageMerge_nativeMerge(JNIEnv * env, jclass cls, jlong bmp1, jlong bmp2, jint trimTop, jint trimBottom, jint distance) {
     if (bmp1 == 0 || bmp2 == 0) {
         return 0;
     }
 
-    // create listener
-    OnCompareFinishedListener myListener(env, listener);
+    NativeBitmap* pMergedBmp = new NativeBitmap();
 
-    // Do merge
-    NativeBitmap* pBmp = new NativeBitmap();
+    // merge
+    sImageCompare.mergeBitmap(NATIVE_BITMAP(bmp1), NATIVE_BITMAP(bmp2), trimTop, trimBottom, distance, *pMergedBmp);
 
-#if defined _DEBUG_IMAGE || defined _DEBUG_PERFORMANCE
-    Debugger debugger(env);
-    sImageCompare.mergeByHash(NATIVE_BITMAP(bmp1), NATIVE_BITMAP(bmp2), *pBmp, myListener, &debugger);
-#else
-    sImageCompare.mergeByHash(NATIVE_BITMAP(bmp1), NATIVE_BITMAP(bmp2), *pBmp, myListener);
-#endif
-
-    return (jlong) pBmp;
+    return (jlong) pMergedBmp;
 }

@@ -23,7 +23,6 @@ protected:
     jint compareFeatures(IN const NativeBitmap& bmp1, IN const NativeBitmap& mask1, IN FeatureList& features1, IN const NativeBitmap& bmp2, IN const NativeBitmap& mask2, IN  FeatureList& features2);
 
 private:
-    bool isSimilarWithMaskedColor(IN const int x, IN const int y, IN const NativeBitmap& bmp, INOUT NativeBitmap& mask, int o);
     void findRect(IN const int index, INOUT std::queue<jint>& queue, INOUT const NativeBitmap& mask, INOUT  Feature& feature);
 
     bool static sort_by_s(const Feature& obj1,const Feature& obj2);

@@ -10,19 +10,27 @@ extern "C" {
 #endif
 /*
  * Class:     com_hf_nativeimagemerge_ImageCompare
- * Method:    nativeMergeByFeature
- * Signature: (JJ)J
+ * Method:    nativeCompareByFeature
+ * Signature: (JJ[I)I
  */
-JNIEXPORT jlong JNICALL Java_com_hf_nativeimagemerge_ImageMerge_nativeMergeByFeature
-  (JNIEnv *, jclass, jlong, jlong, jobject);
+JNIEXPORT jint JNICALL Java_com_hf_nativeimagemerge_ImageMerge_nativeCompareByFeature
+  (JNIEnv *, jclass, jlong, jlong, jintArray);
 
 /*
  * Class:     com_hf_nativeimagemerge_ImageCompare
- * Method:    nativeMergeByHash
- * Signature: (JJ)J
+ * Method:    nativeCompareByHash
+ * Signature: (JJ[I)I
  */
-JNIEXPORT jlong JNICALL Java_com_hf_nativeimagemerge_ImageMerge_nativeMergeByHash
-        (JNIEnv *, jclass, jlong, jlong, jobject);
+JNIEXPORT jint JNICALL Java_com_hf_nativeimagemerge_ImageMerge_nativeCompareByHash
+        (JNIEnv *, jclass, jlong, jlong, jintArray);
+
+/*
+ * Class:     com_hf_nativeimagemerge_ImageCompare
+ * Method:    nativeMerge
+ * Signature: (JJIII)J
+ */
+JNIEXPORT jlong JNICALL Java_com_hf_nativeimagemerge_ImageMerge_nativeMerge
+        (JNIEnv *, jclass, jlong, jlong, jint, jint, jint);
 
 #ifdef __cplusplus
 }
