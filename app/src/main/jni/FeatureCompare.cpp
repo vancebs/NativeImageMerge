@@ -101,7 +101,7 @@ jint FeatureCompare::compare(IN const NativeBitmap& bmp1, IN const NativeBitmap&
     NativeBitmap xorBmp;
     xorBitmap(bmp1, bmp2, xorBmp);
     TRACE_END(pDebugger, "xor");
-    PRINT_IMAGE(pDebugger, DEBUG_IMG_XOR, xorBmp);
+    PRINT_XOR_IMAGE(pDebugger, DEBUG_IMG_XOR, xorBmp);
 
     // mask
     TRACE_BEGIN(pDebugger);
@@ -139,7 +139,7 @@ jint FeatureCompare::compareWithMultiThread(IN const NativeBitmap& bmp1, IN cons
     NativeBitmap xorBmp;
     xorBitmap(bmp1, bmp2, xorBmp);
     TRACE_END(pDebugger, "xor");
-    PRINT_IMAGE(pDebugger, DEBUG_IMG_XOR, xorBmp);
+    PRINT_XOR_IMAGE(pDebugger, DEBUG_IMG_XOR, xorBmp);
 
     // mask
     TRACE_BEGIN(pDebugger);

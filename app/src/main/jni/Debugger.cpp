@@ -44,7 +44,7 @@ bool Debugger::isPerformanceDebugEnabled() const {
     return mPerformanceDebugEnabled;
 }
 
-void Debugger::printBitmap(IN const char* fileName, IN const NativeBitmap& bmp) const {
+void Debugger::printBitmap(IN const char* fileName, IN const NativeBitmap& bmp, bool hasAlpha) const {
     NativeBitmapUtil util(mpEnv);
 
     char path[256];
@@ -54,16 +54,16 @@ void Debugger::printBitmap(IN const char* fileName, IN const NativeBitmap& bmp) 
     strcat(path, "/");
     strcat(path, fileName);
 
-    util.save(path, bmp);
+    util.save(path, bmp, hasAlpha);
 }
 
-void Debugger::printBitmap(IN const char* fileName, IN const NativeBitmap& bmp, FeatureList& featureList) const {
+void Debugger::printBitmap(IN const char* fileName, IN const NativeBitmap& bmp, FeatureList& featureList, bool hasAlpha) const {
     NativeBitmap featureBmp;
     NativeBitmap::create(bmp, featureBmp);
     for (FeatureList::iterator i=featureList.begin(); i!=featureList.end(); i++) {
         drawFeature(featureBmp, *i);
     }
-    printBitmap(fileName, featureBmp);
+    printBitmap(fileName, featureBmp, hasAlpha);
 }
 
 void Debugger::printHashBitmap(IN const char* fileName, IN const NativeBitmap& bmp, const jint* hash) const {

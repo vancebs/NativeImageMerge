@@ -14,6 +14,7 @@
 #define BITMAP_METHOD_GET_PIXELS(clazz) mpEnv->GetMethodID(clazz, "getPixels", "([IIIIIII)V")
 #define BITMAP_METHOD_COMPRESS(clazz) mpEnv->GetMethodID(clazz, "compress", "(Landroid/graphics/Bitmap$CompressFormat;ILjava/io/OutputStream;)Z")
 #define BITMAP_METHOD_RECYCLE(clazz) mpEnv->GetMethodID(clazz, "recycle", "()V")
+//#define BITMAP_METHOD_SET_HAS_ALPHA(clazz) mpEnv->GetMethodID(clazz, "setHasAlpha", "(Z)V")
 
 #define COMPRESS_FORMAT_CLASS mpEnv->FindClass("android/graphics/Bitmap$CompressFormat")
 #define COMPRESS_FORMAT_METHOD_PNG(clazz) mpEnv->GetStaticFieldID(clazz, "PNG", "Landroid/graphics/Bitmap$CompressFormat;")
@@ -27,9 +28,23 @@
 NativeBitmapUtil::NativeBitmapUtil(JNIEnv* env) : mpEnv(env) {
 }
 
-void NativeBitmapUtil::save(IN const char* path, IN const NativeBitmap& bmp) {
+void NativeBitmapUtil::save(IN const char* path, IN const NativeBitmap& bmp, bool hasAlpha) {
     // translate NativeBitmap to Bitmap
-    jobject bitmap = toBitmap(bmp);
+    jobject bitmap;
+    if (hasAlpha) {
+        bitmap = toBitmap(bmp);
+    } else {
+        NativeBitmap tmpBmp;
+        NativeBitmap::create(bmp, tmpBmp);
+        jint* p = tmpBmp.getPixels();
+
+        for (int i=0; i<tmpBmp.getPixelsCount(); i++) {
+            p[i] |= 0xFF000000;
+        }
+
+        bitmap = toBitmap(tmpBmp);
+        tmpBmp.recycle();
+    }
 
     // get compress format PNG
     jclass clsCompressFormat = COMPRESS_FORMAT_CLASS;

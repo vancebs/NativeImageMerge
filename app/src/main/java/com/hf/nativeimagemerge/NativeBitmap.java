@@ -7,7 +7,7 @@ import android.graphics.Bitmap;
  * Created by vance on 2016/8/4.
  */
 public class NativeBitmap {
-    private long mNativePtr;
+    private long mNativePtr = 0;
 
     /*package*/ NativeBitmap(long ptr) {
         mNativePtr = ptr;
@@ -64,7 +64,10 @@ public class NativeBitmap {
      * Recycle native bitmap
      */
     public void recycle() {
-        nativeRecycle(mNativePtr);
+        if (mNativePtr != 0) {
+            nativeRecycle(mNativePtr);
+            mNativePtr = 0;
+        }
     }
 
     /**

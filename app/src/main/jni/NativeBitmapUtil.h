@@ -16,7 +16,7 @@ private:
 public:
     NativeBitmapUtil(JNIEnv* env);
 
-    void save(IN const char* path, IN const NativeBitmap& bmp);
+    void save(IN const char* path, IN const NativeBitmap& bmp, bool hasAlpha = true);
     void load(IN const char* path, OUT NativeBitmap& bmp);
 
     jobject toBitmap(IN const NativeBitmap& bmp);

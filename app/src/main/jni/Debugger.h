@@ -46,6 +46,11 @@
         pDebugger->printBitmap(file, bmp); \
     }
 
+#define PRINT_XOR_IMAGE(pDebugger, file, bmp) \
+    if (pDebugger != NULL && pDebugger->isBitmapDebugEnabled()) { \
+        pDebugger->printBitmap(file, bmp, false); \
+    }
+
 #define PRINT_FEATURE_IMAGE(pDebugger, file, bmp, feature) \
     if (pDebugger != NULL && pDebugger->isBitmapDebugEnabled()) { \
         pDebugger->printBitmap(file, bmp, feature); \
@@ -64,6 +69,7 @@
 #else
 #define IMAGE_DEBUG_DIR
 #define PRINT_IMAGE(pDebugger, file, bmp)
+#define PRINT_XOR_IMAGE(pDebugger, file, bmp)
 #define PRINT_FEATURE_IMAGE(pDebugger, file, bmp, feature)
 #define PRINT_HASH_IMAGE(pDebugger, file, bmp, hash)
 #define PRINT_HASH_MASK_IMAGE(pDebugger, file, bmp, hash)
@@ -90,8 +96,8 @@ public:
     bool isBitmapDebugEnabled() const;
     bool isPerformanceDebugEnabled() const;
 
-    void printBitmap(IN const char* fileName, IN const NativeBitmap& bmp) const;
-    void printBitmap(IN const char* fileName, IN const NativeBitmap& bmp, FeatureList& featureList) const;
+    void printBitmap(IN const char* fileName, IN const NativeBitmap& bmp, bool hasAlpha = true) const;
+    void printBitmap(IN const char* fileName, IN const NativeBitmap& bmp, FeatureList& featureList, bool hasAlpha = true) const;
 
     void printHashBitmap(IN const char* fileName, IN const NativeBitmap& bmp, const jint* hash) const;
     void printHashMaskBitmap(IN const char* fileName, IN const NativeBitmap& bmp, const jint* hashMask) const;
