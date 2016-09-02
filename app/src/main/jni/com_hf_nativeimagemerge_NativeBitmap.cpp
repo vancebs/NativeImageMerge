@@ -30,6 +30,15 @@ JNIEXPORT jlong JNICALL Java_com_hf_nativeimagemerge_NativeBitmap_nativeCreate__
 }
 
 /*
+ * Class:     com_hf_nativeimagemerge_NativeBitmap
+ * Method:    nativeCreate
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL Java_com_hf_nativeimagemerge_NativeBitmap_nativeCreateUninitialized(JNIEnv * env, jclass cls) {
+    return (jlong)(new NativeBitmap());
+}
+
+/*
  * Class:     com_hf_featurecompare_nativeway_NativeBitmap
  * Method:    recycle
  * Signature: (II)J
@@ -83,4 +92,22 @@ JNIEXPORT jint JNICALL Java_com_hf_nativeimagemerge_NativeBitmap_nativeGetWidth(
  */
 JNIEXPORT jint JNICALL Java_com_hf_nativeimagemerge_NativeBitmap_nativeGetHeight(JNIEnv * env, jclass cls, jlong ptr) {
     return NATIVE_BITMAP(ptr).getHeight();
+}
+
+/*
+ * Class:     com_hf_nativeimagemerge_NativeClipTop
+ * Method:    nativeGetHeight
+ * Signature: (JI)J
+ */
+JNIEXPORT jlong JNICALL Java_com_hf_nativeimagemerge_NativeBitmap_nativeClipTop(JNIEnv * env, jclass cls, jlong ptr, jint clipHeight) {
+    return (jlong) &NativeBitmap::clipTop(NATIVE_BITMAP(ptr), clipHeight, *(new NativeBitmap()));
+}
+
+/*
+ * Class:     com_hf_nativeimagemerge_NativeClipBottom
+ * Method:    nativeGetHeight
+ * Signature: (JI)J
+ */
+JNIEXPORT jlong JNICALL Java_com_hf_nativeimagemerge_NativeBitmap_nativeClipBottom(JNIEnv * env, jclass cls, jlong ptr, jint clipHeight) {
+    return (jlong) &NativeBitmap::clipBottom(NATIVE_BITMAP(ptr), clipHeight, *(new NativeBitmap()));
 }

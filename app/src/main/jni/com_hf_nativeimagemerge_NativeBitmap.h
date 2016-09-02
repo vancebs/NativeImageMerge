@@ -34,6 +34,14 @@ JNIEXPORT jlong JNICALL Java_com_hf_nativeimagemerge_NativeBitmap_nativeCreate__
 
 /*
  * Class:     com_hf_nativeimagemerge_NativeBitmap
+ * Method:    nativeCreate
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL Java_com_hf_nativeimagemerge_NativeBitmap_nativeCreateUninitialized
+        (JNIEnv *, jclass);
+
+/*
+ * Class:     com_hf_nativeimagemerge_NativeBitmap
  * Method:    nativeRecycle
  * Signature: (J)V
  */

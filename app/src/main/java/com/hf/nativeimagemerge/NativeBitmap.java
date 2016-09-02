@@ -44,6 +44,14 @@ public class NativeBitmap {
     }
 
     /**
+     * Create a uninitialized NativeBitmap
+     * @return NativeBitmap
+     */
+    public static NativeBitmap createUninitialized() {
+        return new NativeBitmap(nativeCreateUninitialized());
+    }
+
+    /**
      * Create NativeBitmap from Bitmap
      * @param bitmap bitmap
      * @return NativeBitmap
@@ -96,15 +104,27 @@ public class NativeBitmap {
         return nativeGetHeight(mNativePtr);
     }
 
+    public NativeBitmap clipTop(int clipHeight) {
+        return new NativeBitmap(nativeClipTop(mNativePtr, clipHeight));
+    }
+
+    public NativeBitmap clipBottom(int clipHeight) {
+        return new NativeBitmap(nativeClipBottom(mNativePtr, clipHeight));
+    }
+
     private static native long nativeCreate(int width, int height);
     private static native long nativeCreate(long srcPtr);
     private static native long nativeCreate(long srcPtr, int startRow, int endRow);
+    private static native long nativeCreateUninitialized();
     private static native void nativeRecycle(long ptr);
     private static native Object nativeToBitmap(long ptr);
     private static native long nativeFromBitmap(Object bitmap);
 
     private static native int nativeGetWidth(long ptr);
     private static native int nativeGetHeight(long ptr);
+
+    private static native long nativeClipTop(long ptr, int clipHeight);
+    private static native long nativeClipBottom(long ptr, int clipHeight);
 
     static {
         System.loadLibrary("ImageMerge");

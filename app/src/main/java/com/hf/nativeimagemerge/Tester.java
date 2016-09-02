@@ -23,6 +23,7 @@ public class Tester {
         Log.i("==MyTest==", "From com.hf.featurecompare.nativeway");
 
         ImageMerge imageMerge = new ImageMerge();
+        int bottomLen;
         int[] trimmed = new int[2];
         int distance;
         int[] type = new int[1];
@@ -42,6 +43,7 @@ public class Tester {
         for (int i=1; i<bmps.length; i++) {
             // get distance
             distance = compare(imageMerge, bmps[i-1], bmps[i], trimmed, type);
+            bottomLen = trimmed[ImageMerge.INDEX_TRIM_BOTTOM];
 
             // merge
             tmp = imageMerge.merge(merged, bmps[i], trimmed[ImageMerge.INDEX_TRIM_TOP], trimmed[ImageMerge.INDEX_TRIM_BOTTOM], distance);

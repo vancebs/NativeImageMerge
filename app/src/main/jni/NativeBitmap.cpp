@@ -66,6 +66,25 @@ NativeBitmap& NativeBitmap::create(IN const NativeBitmap& src, IN jint startRow,
     return bmp.isInitialized() ? bmp : bmp.init(src, startRow, endRow);
 }
 
+NativeBitmap& NativeBitmap::clipTop(IN const NativeBitmap& src, IN jint clipHeight, OUT NativeBitmap& bmp) {
+    if (!bmp.isInitialized()) {
+        jint width = src.getWidth();
+        NativeBitmap::create(width, clipHeight, bmp);
+        memcpy(bmp.getPixels(), src.getPixels(), clipHeight * width * sizeof(jint));
+    }
+    return bmp;
+}
+
+NativeBitmap& NativeBitmap::clipBottom(IN const NativeBitmap& src, IN jint clipHeight, OUT NativeBitmap& bmp) {
+    if (!bmp.isInitialized()) {
+        jint width = src.getWidth();
+        jint height = src.getHeight();
+        NativeBitmap::create(width, clipHeight, bmp);
+        memcpy(bmp.getPixels(), src.getPixels() + ((height - clipHeight) * width), clipHeight * width * sizeof(jint));
+    }
+    return bmp;
+}
+
 NativeBitmap* NativeBitmap::fromJlong(jlong ptr) {
     return (NativeBitmap*) ptr;
 }
