@@ -9,6 +9,8 @@
 #include <jni.h>
 #include <vector>
 
+#define DEBUG_TAG "ImageMerge"
+
 #define IN
 #define OUT
 #define INOUT

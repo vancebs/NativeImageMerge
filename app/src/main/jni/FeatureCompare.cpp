@@ -421,7 +421,7 @@ inline void FeatureCompare::findRect(IN const jint index, INOUT std::queue<jint>
     }
 }
 #else
-void ImageCompare::findRect(IN const jint index, INOUT std::queue<jint>& queue, INOUT const NativeBitmap& mask, INOUT Feature& feature) {
+void FeatureCompare::findRect(IN const jint index, INOUT std::queue<jint>& queue, INOUT const NativeBitmap& mask, INOUT Feature& feature) {
     jint* pMaskPixels = mask.getPixels();
     jint width = mask.getWidth();
     jint height = mask.getHeight();

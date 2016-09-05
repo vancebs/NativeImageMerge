@@ -45,6 +45,26 @@ public class ImageMerge {
     }
 
     /**
+     * Clip Bitmap from top
+     * @param bmp bitmap
+     * @param clipLength clip length
+     * @return clipped bitmap
+     */
+    public NativeBitmap clipTop(NativeBitmap bmp, int clipLength) {
+        return new NativeBitmap(nativeClipTop(bmp.getNativePtr(), clipLength));
+    }
+
+    /**
+     * Clip bitmap from bottom
+     * @param bmp bitmap
+     * @param clipLength clip length
+     * @return clipped bitmap
+     */
+    public NativeBitmap clipBottom(NativeBitmap bmp, int clipLength) {
+        return new NativeBitmap(nativeClipBottom(bmp.getNativePtr(), clipLength));
+    }
+
+    /**
      * Merge two bitmaps by feature compare
      * @param bmpPtr1 bitmap 1
      * @param bmpPtr2 bitmap 2
@@ -72,4 +92,20 @@ public class ImageMerge {
      * @return 0: merge failed. Otherwise: merged bitmap
      */
     private static native long nativeMerge(long bmpPtr1, long bmpPtr2, int trimTop, int trimBottom, int distance);
+
+    /**
+     * Clip bitmap from top
+     * @param ptr bitmap
+     * @param clipLength clip length
+     * @return clipped bitmap
+     */
+    private static native long nativeClipTop(long ptr, int clipLength);
+
+    /**
+     * Clip bitmap from bottom
+     * @param ptr bitmap
+     * @param clipLength clip length
+     * @return clipped bitmap
+     */
+    private static native long nativeClipBottom(long ptr, int clipLength);
 }

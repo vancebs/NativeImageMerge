@@ -23,7 +23,8 @@ public class Tester {
         Log.i("==MyTest==", "From com.hf.featurecompare.nativeway");
 
         ImageMerge imageMerge = new ImageMerge();
-        int bottomLen;
+        int topLen = -1;
+        int bottomLen = -1;
         int[] trimmed = new int[2];
         int distance;
         int[] type = new int[1];
@@ -43,7 +44,11 @@ public class Tester {
         for (int i=1; i<bmps.length; i++) {
             // get distance
             distance = compare(imageMerge, bmps[i-1], bmps[i], trimmed, type);
-            bottomLen = trimmed[ImageMerge.INDEX_TRIM_BOTTOM];
+
+            if (topLen == -1) { // only save the first
+                topLen = trimmed[ImageMerge.INDEX_TRIM_TOP];
+            }
+            bottomLen = trimmed[ImageMerge.INDEX_TRIM_BOTTOM]; // we should save the last
 
             // merge
             tmp = imageMerge.merge(merged, bmps[i], trimmed[ImageMerge.INDEX_TRIM_TOP], trimmed[ImageMerge.INDEX_TRIM_BOTTOM], distance);
@@ -53,6 +58,14 @@ public class Tester {
 
         // out put
         BitmapDecoder.writeImage(PATH_IMG_OUT, merged);
+
+        // test clip
+        NativeBitmap clipTopBmp = imageMerge.clipTop(bmps[2], topLen);
+        NativeBitmap clipBottomBmp = imageMerge.clipBottom(bmps[2], bottomLen);
+        BitmapDecoder.writeImage(PATH_DIR + "/clipTop", clipTopBmp);
+        BitmapDecoder.writeImage(PATH_DIR + "/clipBottomBmp", clipBottomBmp);
+        clipTopBmp.recycle();
+        clipBottomBmp.recycle();
 
         // clean up
         for (int i=0; i<bmps.length; i++) {

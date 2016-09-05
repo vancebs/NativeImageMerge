@@ -31,9 +31,6 @@ public:
     static NativeBitmap& create(IN const NativeBitmap& src, OUT NativeBitmap& bmp);
     static NativeBitmap& create(IN const NativeBitmap& src, IN jint startRow, IN jint endRow, OUT NativeBitmap& bmp);
 
-    static NativeBitmap& clipTop(IN const NativeBitmap& src, IN jint clipHeight, OUT NativeBitmap& bmp);
-    static NativeBitmap& clipBottom(IN const NativeBitmap& src, IN jint clipHeight, OUT NativeBitmap& bmp);
-
     static NativeBitmap* fromJlong(jlong ptr);
     static jlong toJlong(NativeBitmap* pBmp);
     jlong toJlong();

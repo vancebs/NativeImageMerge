@@ -9,7 +9,7 @@
 extern "C" {
 #endif
 /*
- * Class:     com_hf_nativeimagemerge_ImageCompare
+ * Class:     com_hf_nativeimagemerge_ImageMerge
  * Method:    nativeCompareByFeature
  * Signature: (JJ[I)I
  */
@@ -17,7 +17,7 @@ JNIEXPORT jint JNICALL Java_com_hf_nativeimagemerge_ImageMerge_nativeCompareByFe
   (JNIEnv *, jclass, jlong, jlong, jintArray);
 
 /*
- * Class:     com_hf_nativeimagemerge_ImageCompare
+ * Class:     com_hf_nativeimagemerge_ImageMerge
  * Method:    nativeCompareByHash
  * Signature: (JJ[I)I
  */
@@ -25,12 +25,28 @@ JNIEXPORT jint JNICALL Java_com_hf_nativeimagemerge_ImageMerge_nativeCompareByHa
         (JNIEnv *, jclass, jlong, jlong, jintArray);
 
 /*
- * Class:     com_hf_nativeimagemerge_ImageCompare
+ * Class:     com_hf_nativeimagemerge_ImageMerge
  * Method:    nativeMerge
  * Signature: (JJIII)J
  */
 JNIEXPORT jlong JNICALL Java_com_hf_nativeimagemerge_ImageMerge_nativeMerge
         (JNIEnv *, jclass, jlong, jlong, jint, jint, jint);
+
+/*
+ * Class:     com_hf_nativeimagemerge_ImageMerge
+ * Method:    nativeClipTop
+ * Signature: (JI)J
+ */
+JNIEXPORT jlong JNICALL Java_com_hf_nativeimagemerge_ImageMerge_nativeClipTop
+        (JNIEnv *, jclass, jlong, jint);
+
+/*
+ * Class:     com_hf_nativeimagemerge_ImageMerge
+ * Method:    nativeClipBottom
+ * Signature: (JI)J
+ */
+JNIEXPORT jlong JNICALL Java_com_hf_nativeimagemerge_ImageMerge_nativeClipBottom
+        (JNIEnv *, jclass, jlong, jint);
 
 #ifdef __cplusplus
 }
