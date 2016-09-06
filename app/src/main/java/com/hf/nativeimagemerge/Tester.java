@@ -62,8 +62,8 @@ public class Tester {
         // test clip
         NativeBitmap clipTopBmp = imageMerge.clipTop(bmps[2], topLen);
         NativeBitmap clipBottomBmp = imageMerge.clipBottom(bmps[2], bottomLen);
-        BitmapDecoder.writeImage(PATH_DIR + "/clipTop", clipTopBmp);
-        BitmapDecoder.writeImage(PATH_DIR + "/clipBottomBmp", clipBottomBmp);
+        BitmapDecoder.writeImage(PATH_DIR + "/clipTop.png", clipTopBmp);
+        BitmapDecoder.writeImage(PATH_DIR + "/clipBottomBmp.png", clipBottomBmp);
         clipTopBmp.recycle();
         clipBottomBmp.recycle();
 
