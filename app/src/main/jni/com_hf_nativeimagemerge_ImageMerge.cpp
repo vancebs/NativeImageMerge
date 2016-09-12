@@ -78,24 +78,26 @@ JNIEXPORT jlong JNICALL Java_com_hf_nativeimagemerge_ImageMerge_nativeMerge(JNIE
     return (jlong) pMergedBmp;
 }
 
-/*
- * Class:     com_hf_nativeimagemerge_ImageMerge
- * Method:    nativeClipTop
- * Signature: (JI)J
- */
-JNIEXPORT jlong JNICALL Java_com_hf_nativeimagemerge_ImageMerge_nativeClipTop(JNIEnv * env, jclass cls, jlong ptr, jint clipLength) {
-    NativeBitmap* pOutBmp = new NativeBitmap;
-    sImageCompare.clipBitmapTop(NATIVE_BITMAP(ptr), clipLength, *pOutBmp);
-    return (long) pOutBmp;
+JNIEXPORT jlong JNICALL Java_com_hf_nativeimagemerge_ImageMerge_nativeMerge2(JNIEnv * env, jclass cls, jlong bmp1, jint startY1, jint endY1, jlong bmp2, jint startY2, jint endY2) {
+    if (bmp1 == 0 || bmp2 == 0) {
+        return 0;
+    }
+
+    NativeBitmap* pMergedBmp = new NativeBitmap();
+
+    // merge
+    sImageCompare.mergeBitmap2(NATIVE_BITMAP(bmp1), startY1, endY1, NATIVE_BITMAP(bmp2), startY2, endY2, *pMergedBmp);
+
+    return (jlong) pMergedBmp;
 }
 
 /*
  * Class:     com_hf_nativeimagemerge_ImageMerge
- * Method:    nativeClipBottom
- * Signature: (JI)J
+ * Method:    nativeClip
+ * Signature: (JII)J
  */
-JNIEXPORT jlong JNICALL Java_com_hf_nativeimagemerge_ImageMerge_nativeClipBottom(JNIEnv * env, jclass cls, jlong ptr, jint clipLength) {
+JNIEXPORT jlong JNICALL Java_com_hf_nativeimagemerge_ImageMerge_nativeClip(JNIEnv * env, jclass cls, jlong ptr, jint startY, jint endY) {
     NativeBitmap* pOutBmp = new NativeBitmap;
-    sImageCompare.clipBitmapBottom(NATIVE_BITMAP(ptr), clipLength, *pOutBmp);
+    sImageCompare.clipBitmap(NATIVE_BITMAP(ptr), startY, endY, *pOutBmp);
     return (long) pOutBmp;
 }

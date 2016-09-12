@@ -34,19 +34,20 @@ JNIEXPORT jlong JNICALL Java_com_hf_nativeimagemerge_ImageMerge_nativeMerge
 
 /*
  * Class:     com_hf_nativeimagemerge_ImageMerge
- * Method:    nativeClipTop
- * Signature: (JI)J
+ * Method:    nativeMerge2
+ * Signature: (JIIJII)J
  */
-JNIEXPORT jlong JNICALL Java_com_hf_nativeimagemerge_ImageMerge_nativeClipTop
-        (JNIEnv *, jclass, jlong, jint);
+JNIEXPORT jlong JNICALL Java_com_hf_nativeimagemerge_ImageMerge_nativeMerge2
+        (JNIEnv *, jclass, jlong, jint, jint, jlong, jint, jint);
 
 /*
  * Class:     com_hf_nativeimagemerge_ImageMerge
- * Method:    nativeClipBottom
- * Signature: (JI)J
+ * Method:    nativeClip
+ * Signature: (JII)J
  */
-JNIEXPORT jlong JNICALL Java_com_hf_nativeimagemerge_ImageMerge_nativeClipBottom
-        (JNIEnv *, jclass, jlong, jint);
+JNIEXPORT jlong JNICALL Java_com_hf_nativeimagemerge_ImageMerge_nativeClip
+        (JNIEnv *, jclass, jlong, jint, jint);
+
 
 #ifdef __cplusplus
 }

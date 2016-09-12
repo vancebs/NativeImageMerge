@@ -60,17 +60,27 @@ public class Tester {
         BitmapDecoder.writeImage(PATH_IMG_OUT, merged);
 
         // test clip
-        NativeBitmap clipTopBmp = imageMerge.clipTop(bmps[2], topLen);
-        NativeBitmap clipBottomBmp = imageMerge.clipBottom(bmps[2], bottomLen);
+        int mergedHeight = merged.getHeight();
+        NativeBitmap clipTopBmp = imageMerge.clip(merged, 0, topLen);
+        NativeBitmap clipBottomBmp = imageMerge.clip(merged, mergedHeight - 1 - bottomLen, mergedHeight - 1);
         BitmapDecoder.writeImage(PATH_DIR + "/clipTop.png", clipTopBmp);
         BitmapDecoder.writeImage(PATH_DIR + "/clipBottomBmp.png", clipBottomBmp);
         clipTopBmp.recycle();
         clipBottomBmp.recycle();
+        Log.i("==MyTest==", "clip done");
+
+        // test merge2
+        NativeBitmap merge2 = imageMerge.merge2(bmps[1], 0, bmps[1].getHeight() - 500, bmps[2], 0, bmps[2].getHeight() - 500);
+        BitmapDecoder.writeImage(PATH_DIR + "/merged2.png", merge2);
+        merge2.recycle();
+        Log.i("==MyTest==", "merged2 done");
 
         // clean up
         for (int i=0; i<bmps.length; i++) {
+            Log.i("==MyTest==", "recycle[" + i + "]");
             bmps[i].recycle();
         }
+        Log.i("==MyTest==", "recycle merged");
         merged.recycle();
     }
 

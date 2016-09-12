@@ -11,7 +11,6 @@ NativeBitmap::NativeBitmap() :
     mPixelsCount(0),
     mpPixels(NULL)
 {
-
 }
 
 NativeBitmap::~NativeBitmap() {
@@ -44,7 +43,7 @@ inline bool NativeBitmap::isInitialized() const {
     return mpPixels != NULL;
 }
 
-void NativeBitmap::recycle() {
+void NativeBitmap::release() {
     mWidth = 0;
     mHeight = 0;
     mPixelsCount = 0;

@@ -43,7 +43,7 @@ void NativeBitmapUtil::save(IN const char* path, IN const NativeBitmap& bmp, boo
         }
 
         bitmap = toBitmap(tmpBmp);
-        tmpBmp.recycle();
+        tmpBmp.release();
     }
 
     // get compress format PNG

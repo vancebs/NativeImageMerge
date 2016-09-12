@@ -108,7 +108,7 @@ jint FeatureCompare::compare(IN const NativeBitmap& bmp1, IN const NativeBitmap&
     NativeBitmap mask1, mask2;
     generateMask(xorBmp, bmp1, mask1);
     generateMask(xorBmp, bmp2, mask2);
-    xorBmp.recycle();
+    xorBmp.release();
     TRACE_END(pDebugger, "mask");
     PRINT_IMAGE(pDebugger, DEBUG_IMG_MASK1, mask1);
     PRINT_IMAGE(pDebugger, DEBUG_IMG_MASK2, mask2);
@@ -125,8 +125,8 @@ jint FeatureCompare::compare(IN const NativeBitmap& bmp1, IN const NativeBitmap&
     // compare
     TRACE_BEGIN(pDebugger);
     jint distance = compareFeatures(bmp1, mask1, featureList1, bmp2, mask2, featureList2);
-    mask1.recycle();
-    mask2.recycle();
+    mask1.release();
+    mask2.release();
     TRACE_END(pDebugger, "compare");
 
     // return the distance
@@ -151,7 +151,7 @@ jint FeatureCompare::compareWithMultiThread(IN const NativeBitmap& bmp1, IN cons
         void *args[] = {&arg1, &arg2};
         MultiThreadTask::start(generateMaskThreadRun, 2, args);
     }
-    xorBmp.recycle();
+    xorBmp.release();
     TRACE_END(pDebugger, "mask");
     PRINT_IMAGE(pDebugger, DEBUG_IMG_MASK1, mask1);
     PRINT_IMAGE(pDebugger, DEBUG_IMG_MASK2, mask2);
@@ -173,8 +173,8 @@ jint FeatureCompare::compareWithMultiThread(IN const NativeBitmap& bmp1, IN cons
     // compare
     TRACE_BEGIN(pDebugger);
     jint distance = compareFeatures(bmp1, mask1, featureList1, bmp2, mask2, featureList2);
-    mask1.recycle();
-    mask2.recycle();
+    mask1.release();
+    mask2.release();
     TRACE_END(pDebugger, "compare");
 
     // return the distance;

@@ -23,8 +23,8 @@ jint ImageMerge::compareByFeature(IN const NativeBitmap& bmp1, IN const NativeBi
     // generate distance
     FeatureCompare compare;
     jint distance = compare.compare(trimmed1, trimmed2, pDebugger);
-    trimmed1.recycle();
-    trimmed2.recycle();
+    trimmed1.release();
+    trimmed2.release();
     LOGI("==MyTest==", "distance: %d", distance);
 
     TRACE_FINISH(pDebugger, "finished");
@@ -46,8 +46,8 @@ jint ImageMerge::compareByHash(IN const NativeBitmap& bmp1, IN const NativeBitma
     // compare
     HashCompare compare;
     jint distance = compare.compare(bmp1, bmp2, pDebugger);
-    trimmed1.recycle();
-    trimmed2.recycle();
+    trimmed1.release();
+    trimmed2.release();
     LOGI("==MyTest==", "distance: %d", distance);
 
     TRACE_FINISH(pDebugger, "finished");
@@ -58,6 +58,11 @@ jint ImageMerge::compareByHash(IN const NativeBitmap& bmp1, IN const NativeBitma
 void ImageMerge::mergeBitmap(IN const NativeBitmap& bmp1, IN const NativeBitmap& bmp2, IN const jint trimTop, IN const jint trimBottom, IN const jint distance, OUT NativeBitmap& merged) {
     if (merged.isInitialized()) {
         LOGW(DEBUG_TAG, "ImageMerge::mergeBitmap()# Could not output bitmap to initialized NativeBitmap");
+        return;
+    }
+
+    if (!bmp1.isInitialized() || !bmp2.isInitialized()) {
+        LOGW(DEBUG_TAG, "ImageMerge::mergeBitmap()# Could not read from uninitialized NativeBitmap. bmp1: %d, bmp2: %d.", bmp1.isInitialized(), bmp2.isInitialized());
         return;
     }
 
@@ -89,32 +94,66 @@ void ImageMerge::mergeBitmap(IN const NativeBitmap& bmp1, IN const NativeBitmap&
             newHeight2 * width * sizeof(jint));
 }
 
-void ImageMerge::clipBitmapTop(IN const NativeBitmap& src, IN jint clipLength, OUT NativeBitmap& bmp) {
+void ImageMerge::mergeBitmap2(IN const NativeBitmap& bmp1, IN jint startY1, IN jint endY1, IN const NativeBitmap& bmp2, IN jint startY2, IN jint endY2, OUT NativeBitmap& merged) {
+    if (merged.isInitialized()) {
+        LOGW(DEBUG_TAG, "ImageMerge::mergeBitmap2()# Could not output bitmap to initialized NativeBitmap");
+        return;
+    }
+
+    if (!bmp1.isInitialized() || !bmp2.isInitialized()) {
+        LOGW(DEBUG_TAG, "ImageMerge::mergeBitmap2()# Could not read from uninitialized NativeBitmap. bmp1: %d, bmp2: %d.", bmp1.isInitialized(), bmp2.isInitialized());
+        return;
+    }
+
+    jint width = bmp1.getWidth();
+    jint y1 = startY1;
+    jint h1 = endY1 - startY1 + 1;
+    jint y2 = startY2;
+    jint h2 = endY2 - startY2 + 1;
+    jint newHeight = h1 + h2;
+    jint offset1 = y1 * width;
+    jint length1 = h1 * width;
+    jint offset2 = y2 * width;
+    jint length2 = h2 * width;
+
+    // create merged bitmap
+    NativeBitmap::create(width, newHeight, merged);
+
+    // copy pixels
+    jint* pMergedPixels = merged.getPixels();
+    jint* pBmp1Pixels = bmp1.getPixels();
+    jint* pBmp2Pixels = bmp2.getPixels();
+    memcpy(pMergedPixels, pBmp1Pixels + offset1, length1 * sizeof(jint));
+    memcpy(pMergedPixels + length1, pBmp2Pixels + offset2, length2 * sizeof(jint));
+}
+
+void ImageMerge::clipBitmap(IN const NativeBitmap& src, IN jint startY, IN jint endY, OUT NativeBitmap& bmp) {
     if (bmp.isInitialized()) {
         LOGW(DEBUG_TAG, "ImageMerge::clipBitmapTop()# Could not output bitmap to initialized NativeBitmap");
         return;
     }
 
-    jint width = src.getWidth();
-    NativeBitmap::create(width, clipLength, bmp);
-    memcpy(bmp.getPixels(), src.getPixels(), clipLength * width * sizeof(jint));
-}
-
-void ImageMerge::clipBitmapBottom(IN const NativeBitmap& src, IN jint clipLength, OUT NativeBitmap& bmp) {
-    if (bmp.isInitialized()) {
-        LOGW(DEBUG_TAG, "ImageMerge::clipBitmapBottom()# Could not output bitmap to initialized NativeBitmap");
+    if (!src.isInitialized()) {
+        LOGW(DEBUG_TAG, "ImageMerge::clipBitmapTop()# Could not read uninitialized NativeBitmap");
         return;
     }
 
     jint width = src.getWidth();
-    jint height = src.getHeight();
-    NativeBitmap::create(width, clipLength, bmp);
-    memcpy(bmp.getPixels(), src.getPixels() + ((height - clipLength) * width), clipLength * width * sizeof(jint));
+    jint newHeight = endY - startY + 1;
+    jint offset = startY * width;
+    jint length = newHeight * width;
+    NativeBitmap::create(width, newHeight, bmp);
+    memcpy(bmp.getPixels(), src.getPixels() + offset, length * sizeof(jint));
 }
 
 void ImageMerge::trim(IN const NativeBitmap& bmp1, IN const NativeBitmap& bmp2, IN const jint topOffset, OUT NativeBitmap& trimmed1, OUT NativeBitmap& trimmed2, OUT jint& trimTop, OUT jint& trimBottom) {
     if (trimmed1.isInitialized() || trimmed2.isInitialized()) {
         LOGW(DEBUG_TAG, "ImageMerge::trim()# Could not output bitmap to initialized NativeBitmap. trimmed1: %d, trimmed2: %d", trimmed1.isInitialized(), trimmed2.isInitialized());
+        return;
+    }
+
+    if (!bmp1.isInitialized() || !bmp2.isInitialized()) {
+        LOGW(DEBUG_TAG, "ImageMerge::trim()# Could not read uninitialized NativeBitmap. bmp1: %d, bmp2: %d", bmp1.isInitialized(), bmp2.isInitialized());
         return;
     }
 

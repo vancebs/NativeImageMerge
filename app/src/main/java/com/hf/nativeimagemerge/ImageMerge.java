@@ -45,23 +45,29 @@ public class ImageMerge {
     }
 
     /**
-     * Clip Bitmap from top
-     * @param bmp bitmap
-     * @param clipLength clip length
-     * @return clipped bitmap
+     * Merge two NativeBitmap
+     * @param bmp1 bitmap1
+     * @param startY1 start Y 1
+     * @param endY1 end Y 1
+     * @param bmp2 bitmap2
+     * @param startY2 start Y 2
+     * @param endY2 end Y 2
+     * @return merged bitmap
      */
-    public NativeBitmap clipTop(NativeBitmap bmp, int clipLength) {
-        return new NativeBitmap(nativeClipTop(bmp.getNativePtr(), clipLength));
+    public NativeBitmap merge2(NativeBitmap bmp1, int startY1, int endY1, NativeBitmap bmp2, int startY2, int endY2) {
+        long ptr = nativeMerge2(bmp1.getNativePtr(), startY1, endY1, bmp2.getNativePtr(), startY2, endY2);
+        return (ptr == 0) ? null : new NativeBitmap(ptr);
     }
 
     /**
-     * Clip bitmap from bottom
+     * Clip Bitmap from top
      * @param bmp bitmap
-     * @param clipLength clip length
+     * @param startY clip start Y
+     * @param endY clip end Y
      * @return clipped bitmap
      */
-    public NativeBitmap clipBottom(NativeBitmap bmp, int clipLength) {
-        return new NativeBitmap(nativeClipBottom(bmp.getNativePtr(), clipLength));
+    public NativeBitmap clip(NativeBitmap bmp, int startY, int endY) {
+        return new NativeBitmap(nativeClip(bmp.getNativePtr(), startY, endY));
     }
 
     /**
@@ -83,7 +89,7 @@ public class ImageMerge {
     private static native int nativeCompareByHash(long bmpPtr1, long bmpPtr2, /* out */ int[] trimmed);
 
     /**
-     * Merge two bitmaps by hash compare
+     * Merge two NativeBitmap
      * @param bmpPtr1 bitmap 1
      * @param bmpPtr2 bitmap 2
      * @param trimTop trimTop
@@ -94,18 +100,23 @@ public class ImageMerge {
     private static native long nativeMerge(long bmpPtr1, long bmpPtr2, int trimTop, int trimBottom, int distance);
 
     /**
-     * Clip bitmap from top
-     * @param ptr bitmap
-     * @param clipLength clip length
-     * @return clipped bitmap
+     * Merge two NativeBitmap
+     * @param bmp1 bitmap1
+     * @param startY1 start Y 1
+     * @param endY1 end Y 1
+     * @param bmp2 bitmap2
+     * @param startY2 start Y 2
+     * @param endY2 end Y 2
+     * @return merged bitmap
      */
-    private static native long nativeClipTop(long ptr, int clipLength);
+    private static native long nativeMerge2(long bmp1, int startY1, int endY1, long bmp2, int startY2, int endY2);
 
     /**
-     * Clip bitmap from bottom
+     * Clip bitmap from top
      * @param ptr bitmap
-     * @param clipLength clip length
+     * @param startY clip start Y
+     * @param endY clip end Y
      * @return clipped bitmap
      */
-    private static native long nativeClipBottom(long ptr, int clipLength);
+    private static native long nativeClip(long ptr, int startY, int endY);
 }

@@ -25,7 +25,7 @@ public:
     virtual ~NativeBitmap();
 
     bool isInitialized() const;
-    void recycle();
+    void release();
 
     static NativeBitmap& create(IN jint width, IN jint height, OUT NativeBitmap& bmp);
     static NativeBitmap& create(IN const NativeBitmap& src, OUT NativeBitmap& bmp);
